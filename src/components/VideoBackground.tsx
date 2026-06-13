@@ -60,10 +60,15 @@ export default function VideoBackground({
         <div
           aria-hidden="true"
           className={cn(
-            "absolute inset-0 z-[1] bg-cover bg-center transition-opacity duration-700",
+            "absolute inset-0 z-[1] transition-opacity duration-700",
             playing ? "opacity-0" : "opacity-100"
           )}
-          style={{ backgroundImage: `url(${poster})` }}
+          style={{
+            backgroundImage: `url("${poster}")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
         />
       )}
       <video

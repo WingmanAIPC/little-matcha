@@ -9,8 +9,8 @@ export default function Hero() {
       <Media asset={videos.hero} fill priority />
 
       {/* Legibility scrim — light enough to let the hero video read through */}
-      <div className="absolute inset-0 z-[2] bg-gradient-to-b from-matcha-900/45 via-matcha-900/20 to-matcha-900/65" />
-      <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(35,39,28,0.35)_100%)]" />
+      <div className="absolute inset-0 z-[2] bg-gradient-to-b from-matcha-900/35 via-matcha-900/15 to-matcha-900/55" />
+      <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(35,39,28,0.3)_100%)]" />
 
       {/* Floating leaves */}
       <svg

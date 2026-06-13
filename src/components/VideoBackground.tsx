@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/cn";
 
@@ -11,13 +10,11 @@ interface VideoBackgroundProps {
 }
 
 /**
- * Autoplaying background video with a guaranteed-visible poster layer.
- *
- * - The poster renders as a real <Image> behind the video (z-0), so a photo
- *   ALWAYS shows even if autoplay is blocked or the video never paints.
- * - The <video> sits on top (z-10) and covers the poster once it plays.
- * - play() is forced muted and retried on load events and on the first user
- *   interaction (covers Safari, Low Power Mode, and strict autoplay policies).
+ * Dead-simple background media: a raw <img> poster that ALWAYS paints, with a
+ * <video> layered on top that covers it once playback starts. Everything uses
+ * direct /public paths (no image optimizer) and native elements only, so it
+ * renders identically in every browser. If autoplay is blocked, the poster
+ * photo stays visible underneath.
  */
 export default function VideoBackground({
   src,
@@ -32,15 +29,13 @@ export default function VideoBackground({
 
     video.muted = true;
     video.defaultMuted = true;
-    video.playsInline = true;
-    video.setAttribute("muted", "");
 
     const tryPlay = () => {
       video.muted = true;
       const p = video.play();
       if (p && typeof p.catch === "function") {
         p.catch(() => {
-          /* Autoplay blocked — poster image stays visible behind. */
+          /* Autoplay blocked — poster photo stays visible. */
         });
       }
     };
@@ -49,7 +44,6 @@ export default function VideoBackground({
     video.addEventListener("loadeddata", tryPlay);
     video.addEventListener("canplay", tryPlay);
 
-    // Kick playback off on the first interaction if the browser blocked autoplay.
     const onInteract = () => tryPlay();
     window.addEventListener("pointerdown", onInteract, { once: true });
     window.addEventListener("touchstart", onInteract, { once: true });
@@ -67,14 +61,12 @@ export default function VideoBackground({
   return (
     <>
       {poster && (
-        <Image
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
           src={poster}
           alt=""
           aria-hidden="true"
-          fill
-          sizes="100vw"
-          className="z-0 object-cover"
-          priority
+          className="absolute inset-0 z-0 h-full w-full object-cover"
         />
       )}
       <video

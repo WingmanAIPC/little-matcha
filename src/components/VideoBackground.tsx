@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/cn";
 
 interface VideoBackgroundProps {
@@ -10,10 +11,13 @@ interface VideoBackgroundProps {
 }
 
 /**
- * Autoplaying background video.
- * - A poster image sits behind the video so a real photo always shows,
- *   even if autoplay is blocked or the video is still buffering.
- * - play() is retried for Safari / low-power mode quirks.
+ * Autoplaying background video with a guaranteed-visible poster layer.
+ *
+ * - The poster renders as a real <Image> behind the video (z-0), so a photo
+ *   ALWAYS shows even if autoplay is blocked or the video never paints.
+ * - The <video> sits on top (z-10) and covers the poster once it plays.
+ * - play() is forced muted and retried on load events and on the first user
+ *   interaction (covers Safari, Low Power Mode, and strict autoplay policies).
  */
 export default function VideoBackground({
   src,
@@ -21,7 +25,6 @@ export default function VideoBackground({
   className,
 }: VideoBackgroundProps) {
   const ref = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     const video = ref.current;
@@ -30,51 +33,54 @@ export default function VideoBackground({
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
+    video.setAttribute("muted", "");
 
     const tryPlay = () => {
+      video.muted = true;
       const p = video.play();
-      if (p && typeof p.then === "function") {
-        p.then(() => setPlaying(true)).catch(() => {
-          /* Autoplay blocked — poster stays visible. */
+      if (p && typeof p.catch === "function") {
+        p.catch(() => {
+          /* Autoplay blocked — poster image stays visible behind. */
         });
       }
     };
 
-    const onPlaying = () => setPlaying(true);
-
     tryPlay();
     video.addEventListener("loadeddata", tryPlay);
     video.addEventListener("canplay", tryPlay);
-    video.addEventListener("playing", onPlaying);
+
+    // Kick playback off on the first interaction if the browser blocked autoplay.
+    const onInteract = () => tryPlay();
+    window.addEventListener("pointerdown", onInteract, { once: true });
+    window.addEventListener("touchstart", onInteract, { once: true });
+    window.addEventListener("scroll", onInteract, { once: true, passive: true });
 
     return () => {
       video.removeEventListener("loadeddata", tryPlay);
       video.removeEventListener("canplay", tryPlay);
-      video.removeEventListener("playing", onPlaying);
+      window.removeEventListener("pointerdown", onInteract);
+      window.removeEventListener("touchstart", onInteract);
+      window.removeEventListener("scroll", onInteract);
     };
   }, [src]);
 
   return (
     <>
       {poster && (
-        <div
+        <Image
+          src={poster}
+          alt=""
           aria-hidden="true"
-          className={cn(
-            "absolute inset-0 z-[1] transition-opacity duration-700",
-            playing ? "opacity-0" : "opacity-100"
-          )}
-          style={{
-            backgroundImage: `url("${poster}")`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
+          fill
+          sizes="100vw"
+          className="z-0 object-cover"
+          priority
         />
       )}
       <video
         ref={ref}
         className={cn(
-          "absolute inset-0 z-[2] h-full w-full object-cover",
+          "absolute inset-0 z-10 h-full w-full object-cover",
           className
         )}
         autoPlay

@@ -75,7 +75,7 @@ export default function Media({
   return (
     <div
       className={cn(
-        "relative overflow-hidden bg-sand text-matcha-900",
+        "relative isolate overflow-hidden bg-sand text-matcha-900",
         fill && "absolute inset-0",
         className
       )}

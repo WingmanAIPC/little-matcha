@@ -8,9 +8,8 @@ export default function Hero() {
     <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden">
       <Media asset={videos.hero} fill priority />
 
-      {/* Legibility scrim — light enough to let the hero video read through */}
-      <div className="absolute inset-0 z-[2] bg-gradient-to-b from-matcha-900/35 via-matcha-900/15 to-matcha-900/55" />
-      <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(35,39,28,0.3)_100%)]" />
+      {/* Very light flat tint just for text legibility (no gradient) */}
+      <div className="absolute inset-0 z-[2] bg-black/15" />
 
       {/* Floating leaves */}
       <svg
@@ -28,7 +27,7 @@ export default function Hero() {
         <path d="M20 6c-6 4-7.7 10 0 17 7.7-7 6-13 0-17z" fill="currentColor" />
       </svg>
 
-      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center text-cream-foam">
+      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center text-cream-foam [text-shadow:0_2px_24px_rgba(0,0,0,0.5)]">
         <p
           className="mb-6 text-xs font-semibold uppercase tracking-[0.35em] text-cream-foam/80 opacity-0"
           style={{ animation: "lm-rise 0.9s var(--ease-out-soft) 0.1s forwards" }}

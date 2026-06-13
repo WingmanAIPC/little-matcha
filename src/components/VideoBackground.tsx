@@ -10,11 +10,10 @@ interface VideoBackgroundProps {
 }
 
 /**
- * Dead-simple background media: a raw <img> poster that ALWAYS paints, with a
- * <video> layered on top that covers it once playback starts. Everything uses
- * direct /public paths (no image optimizer) and native elements only, so it
- * renders identically in every browser. If autoplay is blocked, the poster
- * photo stays visible underneath.
+ * Background media: a raw <img> poster that paints instantly, with a <video>
+ * layered on top. The video is lazy — it only downloads + plays once it scrolls
+ * near the viewport, so the page doesn't try to fetch every video at once.
+ * If autoplay is blocked, the poster photo stays visible underneath.
  */
 export default function VideoBackground({
   src,
@@ -22,16 +21,18 @@ export default function VideoBackground({
   className,
 }: VideoBackgroundProps) {
   const ref = useRef<HTMLVideoElement>(null);
+  const startedRef = useRef(false);
 
   useEffect(() => {
     const video = ref.current;
     if (!video) return;
 
-    video.muted = true;
-    video.defaultMuted = true;
-
-    const tryPlay = () => {
+    const start = () => {
+      if (startedRef.current) return;
+      startedRef.current = true;
       video.muted = true;
+      video.defaultMuted = true;
+      video.load();
       const p = video.play();
       if (p && typeof p.catch === "function") {
         p.catch(() => {
@@ -40,21 +41,30 @@ export default function VideoBackground({
       }
     };
 
-    tryPlay();
-    video.addEventListener("loadeddata", tryPlay);
-    video.addEventListener("canplay", tryPlay);
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) start();
+      },
+      { rootMargin: "300px 0px" }
+    );
+    io.observe(video);
 
-    const onInteract = () => tryPlay();
+    // Safety net: also retry play on the first user interaction.
+    const onInteract = () => {
+      if (startedRef.current) {
+        video.muted = true;
+        video.play().catch(() => {});
+      } else {
+        start();
+      }
+    };
     window.addEventListener("pointerdown", onInteract, { once: true });
     window.addEventListener("touchstart", onInteract, { once: true });
-    window.addEventListener("scroll", onInteract, { once: true, passive: true });
 
     return () => {
-      video.removeEventListener("loadeddata", tryPlay);
-      video.removeEventListener("canplay", tryPlay);
+      io.disconnect();
       window.removeEventListener("pointerdown", onInteract);
       window.removeEventListener("touchstart", onInteract);
-      window.removeEventListener("scroll", onInteract);
     };
   }, [src]);
 
@@ -75,11 +85,10 @@ export default function VideoBackground({
           "absolute inset-0 z-10 h-full w-full object-cover",
           className
         )}
-        autoPlay
         muted
         loop
         playsInline
-        preload="auto"
+        preload="none"
         poster={poster ?? undefined}
         aria-label="Background video"
       >

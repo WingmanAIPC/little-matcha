@@ -25,9 +25,9 @@ export default function Ritual() {
     <section className="bg-ink text-cream-foam">
       <div className="relative h-[58vh] min-h-[420px] w-full overflow-hidden sm:h-[78vh]">
         <Media asset={videos.ritual} fill sizes="100vw" />
-        <div className="absolute inset-0 z-[2] bg-gradient-to-t from-ink via-ink/25 to-ink/15" />
+        <div className="absolute inset-0 z-[2] bg-black/20" />
         <div className="absolute inset-0 z-[2] flex items-center justify-center px-6">
-          <Reveal className="max-w-3xl text-center">
+          <Reveal className="max-w-3xl text-center [text-shadow:0_2px_24px_rgba(0,0,0,0.55)]">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-matcha-200/90">
               The craft
             </p>

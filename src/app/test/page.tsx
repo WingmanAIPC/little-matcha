@@ -15,7 +15,7 @@ export default function TestPage() {
         <h2 style={{ fontSize: 18, margin: "8px 0" }}>1. Plain &lt;img&gt; (raw /images path)</h2>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/story-whisk.png"
+          src="/images/story-whisk.jpg"
           alt="whisking matcha"
           style={{ width: "100%", maxWidth: 640, display: "block", borderRadius: 12 }}
         />
@@ -25,7 +25,7 @@ export default function TestPage() {
         <h2 style={{ fontSize: 18, margin: "8px 0" }}>2. Plain &lt;video&gt; (raw /videos path)</h2>
         <video
           src="/videos/hero.mp4"
-          poster="/images/story-whisk.png"
+          poster="/images/story-whisk.jpg"
           autoPlay
           muted
           loop
@@ -40,13 +40,13 @@ export default function TestPage() {
         <div style={{ position: "relative", height: "60vh", overflow: "hidden", borderRadius: 12 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/gallery-foam.png"
+            src="/images/gallery-foam.jpg"
             alt=""
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
           />
           <video
             src="/videos/ritual.mp4"
-            poster="/images/gallery-foam.png"
+            poster="/images/gallery-foam.jpg"
             autoPlay
             muted
             loop

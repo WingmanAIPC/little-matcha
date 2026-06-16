@@ -75,8 +75,8 @@ export default function Media({
   return (
     <div
       className={cn(
-        "relative isolate overflow-hidden bg-sand text-matcha-900",
-        fill && "absolute inset-0",
+        "isolate overflow-hidden bg-sand text-matcha-900",
+        fill ? "absolute inset-0" : "relative",
         className
       )}
       style={aspectStyle}
